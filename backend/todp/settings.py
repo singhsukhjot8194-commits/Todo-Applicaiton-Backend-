@@ -12,22 +12,27 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Get environment variables safely
+def get_env_variable(var_name, default_value=None):
+    """Get environment variable with optional default value"""
+    return os.environ.get(var_name, default_value)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-inb41chud#!&ovy(t=_a%vs@k68f*dzajy9b+@&n2qiy#54$h3')
+SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-inb41chud#!&ovy(t=_a%vs@k68f*dzajy9b+@&n2qiy#54$h3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+# Parse ALLOWED_HOSTS
+ALLOWED_HOSTS_STR = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1,*.railway.app')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 
 # Application definition
@@ -130,7 +135,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000', cast=Csv())
+CORS_ALLOWED_ORIGINS_STR = get_env_variable('CORS_ALLOWED_ORIGINS', 'http://localhost:3000')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_STR.split(',')]
 
 # Security Settings (for production)
 if not DEBUG:
