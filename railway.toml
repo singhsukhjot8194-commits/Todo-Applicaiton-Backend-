@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd backend && pip install -r requirements.txt && python manage.py collectstatic --noinput"
+startCommand = "cd backend && gunicorn todp.wsgi:application --bind 0.0.0.0:$PORT"
+
+[deploy]
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
